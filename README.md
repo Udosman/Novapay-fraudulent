@@ -1,177 +1,211 @@
-Fraud Detection Using Machine Learning, SHAP, FastAPI and Docker
+💳 Explainable Fraud Detection System
+Machine Learning · SHAP · FastAPI · Docker
 
-Content
-Project Overview
-Project Workflow
-Dataset and Preprocessing
-Machine Learning Models
-Model Performance Comparison
-RandomizedSearchCV
-GridSearchCV
-Threshold Optimisation
-SHAP Model Explainability
-Individual Fraud Explanation
-FastAPI Deployment
-Docker Containerisation
-Project Structure
-Technologies Used
-Key Insights
-Conclusion
-Future Improvements
+An end-to-end machine learning solution for detecting fraudulent digital money-transfer transactions, explaining model decisions, and serving predictions through a containerised REST API.
 
-Project Overview
+The project demonstrates the complete ML lifecycle—from data preparation and model development to hyperparameter optimisation, explainable AI, API development, and Docker containerisation.
 
-This project develops an end-to-end machine learning system for detecting fraudulent financial transactions.
+📌 Project Overview
 
-The workflow covers data preprocessing, exploratory analysis, feature engineering, model development, hyperparameter optimisation, threshold tuning, model explainability using SHAP, API deployment with FastAPI, and containerisation using Docker.
+Fraud detection presents a significant challenge for digital payment and money-transfer platforms because fraudulent transactions typically represent only a small proportion of overall transaction volume.
 
-The overall objective is to develop an accurate and explainable fraud detection system that can identify suspicious transactions while minimising unnecessary fraud alerts.
+The objective of this project was to develop a scalable and explainable machine-learning system capable of identifying potentially fraudulent transactions while minimising unnecessary false fraud alerts.
 
-Project Workflow
+The project addresses three key questions:
 
-The project followed the sequence below:
+Can fraudulent transactions be identified accurately using machine learning?
+Which transaction and behavioural characteristics drive fraud predictions?
+Can the trained model be converted into a deployable application rather than remaining only in a notebook?
 
-Import Libraries
-        ↓
-Load Dataset
-        ↓
-Data Inspection
-        ↓
-Data Cleaning
-        ↓
-Exploratory Data Analysis
-        ↓
+To address these questions, Logistic Regression and Random Forest models were evaluated, followed by RandomizedSearchCV, GridSearchCV, decision-threshold optimisation, SHAP explainability, FastAPI deployment, and Docker containerisation.
+
+🎯 Final Model Performance
+
+The optimised Random Forest classifier achieved:
+
+Metric	Performance
+Accuracy	98.24%
+Fraud Precision	100.00%
+Fraud Recall	79.90%
+Fraud F1-score	88.83%
+Decision Threshold	0.55
+
+The selected threshold prioritises very high precision while maintaining approximately 80% fraud recall.
+
+This means transactions classified as fraudulent have a very low false-positive rate, although further work could focus on identifying a greater proportion of fraudulent transactions.
+
+🧠 Machine Learning Workflow
+Raw Transaction Data
+        │
+        ▼
+Data Cleaning & Validation
+        │
+        ▼
 Feature Engineering
-        ↓
-Encoding and Preprocessing
-        ↓
-Train/Test Split
-        ↓
-Logistic Regression
-        ↓
-Random Forest
-        ↓
+        │
+        ▼
+Encoding & Preprocessing
+        │
+        ▼
+Stratified Train/Test Split
+        │
+        ▼
+Baseline Models
+ ┌──────────────┬───────────────┐
+ │   Logistic   │ Random Forest │
+ │  Regression  │               │
+ └──────────────┴───────────────┘
+        │
+        ▼
 RandomizedSearchCV
-        ↓
+        │
+        ▼
 GridSearchCV
-        ↓
+        │
+        ▼
 Threshold Optimisation
-        ↓
-Final Model Selection
-        ↓
+        │
+        ▼
+Final Random Forest
+        │
+        ▼
 SHAP Explainability
-        ↓
-FastAPI Deployment
-        ↓
-Docker Containerisation
-Dataset and Preprocessing
+        │
+        ▼
+FastAPI REST API
+        │
+        ▼
+Docker Container
+📊 Dataset
 
 The final modelling dataset contained:
 
-11,335 observations
-52 predictor features
-Target variable: is_fraud
-Training set: 9,068 observations
-Test set: 2,267 observations
+11,335 transactions
+52 predictive features
+Binary target: is_fraud
+9,068 training observations
+2,267 test observations
+Training Class Distribution
+Transaction Class	Observations
+Legitimate	8,272
+Fraudulent	796
 
+The class distribution demonstrates the imbalance commonly encountered in real-world fraud detection.
 
-Training class distribution:
+To account for this imbalance, stratified sampling and class weighting were incorporated into model development.
 
-Class	Number
-Legitimate transactions (0)	8,272
-Fraudulent transactions (1)	796
+🔧 Data Preparation
 
-The dataset was therefore imbalanced, with fraudulent transactions representing the minority class.
+The preprocessing workflow included:
 
-Data preprocessing included:
-
-Missing-value treatment
-Duplicate and inconsistent record handling
-Date/time preprocessing
+Missing-value assessment and treatment
+Duplicate identification
+Data-type correction
+Timestamp processing
 Categorical encoding
 Feature engineering
 Numeric preprocessing
 Stratified train/test splitting
+Class-imbalance handling
 
-Machine Learning Models
+The final machine-learning feature matrix contained 52 numerical predictors.
 
-Two main classification algorithms were initially evaluated:
+🤖 Model Development
+
+Two primary classification algorithms were initially compared.
 
 Logistic Regression
-Random Forest Classifier
-Model Performance Comparison
-Model	Accuracy	Precision (Fraud)	Recall (Fraud)	F1-score (Fraud)
-Logistic Regression	0.9500	0.7000	0.8300	0.7600
-Baseline Random Forest	0.9800	0.9900	0.8000	0.8900
-RandomizedSearchCV Random Forest	0.9819	0.9938	0.7990	0.8858
-GridSearchCV Random Forest	0.9819	0.9938	0.7990	0.8858
 
+Logistic Regression provided a useful interpretable baseline.
 
-Model Interpretation
+Its fraud-class performance was approximately:
 
-Logistic Regression achieved slightly higher fraud recall, identifying approximately 83% of fraudulent transactions. However, its lower precision of 70% means it produced substantially more false fraud alerts.
+Metric	Result
+Precision	70%
+Recall	83%
+F1-score	76%
+Accuracy	95%
 
-Random Forest demonstrated superior overall performance. It achieved approximately 98% accuracy, 99% fraud precision, and an F1-score close to 89%.
+Although Logistic Regression detected a slightly larger proportion of fraudulent transactions, its lower precision resulted in considerably more false-positive fraud alerts.
 
-The model therefore provided a substantially better balance between fraud identification and avoidance of false positives.
+Random Forest
 
-Hyperparameter Optimisation
+The baseline Random Forest substantially improved overall fraud classification.
+
+Metric	Result
+Precision	99%
+Recall	80%
+F1-score	89%
+Accuracy	98%
+
+Random Forest therefore provided a substantially stronger balance between fraud detection and false-positive control.
+
+⚙️ Hyperparameter Optimisation
 RandomizedSearchCV
 
-RandomizedSearchCV was first used to explore a broad Random Forest hyperparameter space.
+RandomizedSearchCV was used to explore a broad Random Forest hyperparameter space using 5-fold cross-validation.
 
-The best model identified approximately the following parameters:
+The best configuration identified included:
 
-criterion = entropy
-max_depth = 20
-min_samples_leaf = 2
-min_samples_split = 6
-n_estimators = 379
-class_weight = balanced
-
-The resulting test performance was:
-
-Accuracy: 0.9819
-Precision: 0.9938
-Recall: 0.7990
-F1-score: 0.8858
+RandomForestClassifier(
+    class_weight="balanced",
+    criterion="entropy",
+    max_depth=20,
+    min_samples_leaf=2,
+    min_samples_split=6,
+    n_estimators=379,
+    n_jobs=-1,
+    random_state=42
+)
+Performance
+Metric	Result
+Accuracy	0.9819
+Precision	0.9938
+Recall	0.7990
+F1-score	0.8858
 
 Confusion matrix:
 
 [[2067,    1],
  [  40,  159]]
 
-This means the model correctly identified 159 fraudulent transactions while missing 40 fraud cases and incorrectly flagging only one legitimate transaction.
+Only one legitimate transaction was incorrectly classified as fraudulent.
 
-GridSearchCV
+🔍 GridSearchCV
 
-A more focused GridSearchCV search was subsequently conducted around the parameter region identified by RandomizedSearchCV.
+A more focused GridSearchCV was subsequently performed around the promising parameter region identified by RandomizedSearchCV.
 
-The best GridSearchCV Random Forest used:
+The best estimator was:
 
-criterion = entropy
-max_depth = 20
-max_features = log2
-min_samples_split = 4
-n_estimators = 425
-class_weight = balanced
+RandomForestClassifier(
+    class_weight="balanced",
+    criterion="entropy",
+    max_depth=20,
+    max_features="log2",
+    min_samples_split=4,
+    n_estimators=425,
+    n_jobs=-1,
+    random_state=42
+)
+GridSearchCV Performance
+Metric	Result
+Accuracy	0.9819
+Precision	0.9938
+Recall	0.7990
+F1-score	0.8858
 
-Its test performance was:
+Both optimisation strategies therefore produced highly consistent test-set performance.
 
-Accuracy: 0.9819
-Precision: 0.9938
-Recall: 0.7990
-F1-score: 0.8858
+🎚️ Decision-Threshold Optimisation
 
-GridSearchCV therefore produced similar test-set performance to RandomizedSearchCV.
+Fraud detection involves an important trade-off between:
 
-Threshold Optimisation
+False positives: legitimate customers incorrectly flagged as fraudulent.
+False negatives: fraudulent transactions that remain undetected.
 
-Because fraud detection depends heavily on the trade-off between false positives and false negatives, different probability thresholds were evaluated.
+Different probability thresholds were therefore evaluated.
 
-Selected results included:
-
-Threshold	Accuracy	Precision	Recall	F1-score
+Threshold	Accuracy	Precision	Recall	F1
 0.20	0.9718	0.8571	0.8141	0.8351
 0.30	0.9797	0.9636	0.7990	0.8736
 0.40	0.9819	0.9938	0.7990	0.8858
@@ -180,24 +214,24 @@ Threshold	Accuracy	Precision	Recall	F1-score
 0.60	0.9824	1.0000	0.7990	0.8883
 0.80	0.9806	1.0000	0.7789	0.8757
 
-A threshold of 0.55 was selected as the operating threshold.
+A probability threshold of 0.55 was selected.
 
-At this threshold, the model achieved:
+This produced the strongest F1-score while achieving 100% fraud precision on the evaluation set.
 
-Accuracy: 98.24%
-Precision: 100%
-Recall: 79.90%
-F1-score: 88.83%
+🔎 Explainable AI with SHAP
 
-The model therefore generated virtually no false-positive fraud alerts while detecting approximately 80% of actual fraudulent transactions.
+High predictive performance alone is insufficient for many financial risk applications. Analysts also need to understand why a transaction has been classified as suspicious.
 
-Model Explainability Using SHAP
+SHAP (SHapley Additive exPlanations) was therefore incorporated to provide both:
 
-SHAP (SHapley Additive exPlanations) was used to explain both global model behaviour and individual fraud predictions.
+Global model explainability
+Transaction-level explainability
+Global Feature Importance
 
-Global SHAP Findings
 
-The most influential features included:
+
+
+The strongest model drivers included:
 
 txn_velocity_24h
 txn_velocity_1h
@@ -210,22 +244,34 @@ location_mismatch
 amount_src
 amount_usd
 
-The SHAP analysis showed that high transaction velocity, high IP risk, elevated internal risk scores, chargeback history, location mismatch, and higher transaction values generally contributed positively to fraud predictions.
+Transaction behaviour and risk characteristics were therefore generally more influential than transaction amount alone.
 
-In contrast:
+SHAP Beeswarm Analysis
 
-Older accounts generally reduced predicted fraud risk.
-Higher device trust scores generally reduced predicted fraud risk.
 
-Overall, the model relied strongly on behavioural, device, network, and transaction-risk characteristics.
 
-Individual Fraud Explanation
 
-A local SHAP analysis was also performed for an individual fraudulent transaction.
+The SHAP summary analysis demonstrates both the magnitude and direction of feature contributions.
 
-The strongest positive contributions included:
+Key patterns include:
 
-Feature	SHAP Value
+High transaction velocity tends to increase fraud risk.
+Higher IP risk contributes positively to fraud predictions.
+Elevated internal risk scores increase predicted fraud risk.
+Previous chargeback activity contributes to suspicious classifications.
+Location mismatch increases fraud risk.
+Greater account maturity generally reduces fraud risk.
+Higher device trust generally reduces fraud risk.
+🔬 Individual Transaction Explanation
+
+
+
+
+SHAP was also used to explain individual model predictions.
+
+For the investigated fraudulent transaction, major contributors included:
+
+Feature	SHAP Contribution
 txn_velocity_24h	0.104369
 txn_velocity_1h	0.088656
 ip_risk_score	0.067026
@@ -235,84 +281,102 @@ device_trust_score	0.035274
 chargeback_history_count	0.034299
 location_mismatch	0.028711
 
-This demonstrated that the fraud classification was driven by the combined influence of multiple behavioural and risk indicators rather than a single feature.
+This demonstrates that the model's fraud decision is based on the combined influence of several behavioural and risk indicators rather than a single variable.
 
-SHAP Visualisations
+💡 Business Insights
 
-The project includes explainability figures such as:
+The analysis suggests several operationally relevant fraud indicators.
 
-Figures/
-├── shap_feature_importance.png
-├── shap_summary_beeswarm.png
-└── shap_individual_fraud_waterfall.png
+1. Transaction velocity is highly informative
 
-Example Markdown references:
+txn_velocity_24h and txn_velocity_1h were the strongest predictors.
 
-![SHAP Feature Importance](Figures/shap_feature_importance.png)
+Rapid transaction activity may therefore provide an important early-warning signal for suspicious behaviour.
 
-![SHAP Beeswarm Plot](Figures/shap_summary_beeswarm.png)
-FastAPI Deployment
+2. Network risk matters
 
-The final fraud detection model was exposed through a FastAPI application.
+ip_risk_score was one of the strongest model drivers, demonstrating the potential value of network and IP intelligence in transaction monitoring.
+
+3. Account maturity provides useful context
+
+Newer accounts were associated with greater fraud risk, suggesting that account age can support risk-based transaction screening.
+
+4. Device information adds predictive value
+
+Lower device trust was associated with increased fraud risk.
+
+Device intelligence can therefore complement conventional transaction monitoring.
+
+5. Historical behaviour matters
+
+Chargeback history contributed meaningfully to predictions, supporting the inclusion of historical customer behaviour in fraud-risk assessment.
+
+6. Transaction amount alone is insufficient
+
+Although transaction amounts contributed to the model, behavioural and risk indicators were substantially more influential.
+
+A robust fraud strategy should therefore combine monetary, behavioural, device, geographic and network characteristics.
+
+🚀 FastAPI Deployment
+
+The trained model was converted from a notebook-based machine-learning experiment into a REST API using FastAPI.
 
 The API provides:
 
 Model health checking
 Fraud classification
 Fraud probability
-Decision threshold
-SHAP-based explanation of the most influential features
+Configurable decision threshold
+SHAP-based explanation output
 Health Endpoint
 GET /health
 
 Example response:
 
 {
-  "status": "healthy",
-  "model_loaded": true,
-  "model": "Tuned Random Forest",
-  "threshold": 0.55,
-  "number_of_features": 52
+    "status": "healthy",
+    "model_loaded": true,
+    "model": "Tuned Random Forest",
+    "threshold": 0.55,
+    "number_of_features": 52
 }
 Prediction Endpoint
 POST /predict
 
-Example prediction response:
+Example output:
 
 {
-  "prediction": 1,
-  "classification": "Fraudulent",
-  "fraud_probability": 1.0,
-  "decision_threshold": 0.55,
-  "top_explanations": [
-    {
-      "feature": "txn_velocity_24h",
-      "shap_value": 0.104369,
-      "direction": "increases fraud risk"
-    },
-    {
-      "feature": "txn_velocity_1h",
-      "shap_value": 0.088656,
-      "direction": "increases fraud risk"
-    },
-    {
-      "feature": "ip_risk_score",
-      "shap_value": 0.067026,
-      "direction": "increases fraud risk"
-    }
-  ]
+    "prediction": 1,
+    "classification": "Fraudulent",
+    "fraud_probability": 1.0,
+    "decision_threshold": 0.55,
+    "top_explanations": [
+        {
+            "feature": "txn_velocity_24h",
+            "shap_value": 0.104369,
+            "direction": "increases fraud risk"
+        },
+        {
+            "feature": "txn_velocity_1h",
+            "shap_value": 0.088656,
+            "direction": "increases fraud risk"
+        },
+        {
+            "feature": "ip_risk_score",
+            "shap_value": 0.067026,
+            "direction": "increases fraud risk"
+        }
+    ]
 }
 
-The interactive FastAPI documentation is available locally at:
+Interactive FastAPI documentation is available locally through:
 
 http://127.0.0.1:8000/docs
+🐳 Docker Containerisation
 
+The FastAPI application was containerised using Docker to provide a portable and reproducible runtime environment.
 
-Docker Containerisation
-
-The FastAPI application was containerised using Docker.
-
-Docker Build
+Build the Docker Image
 
 From the project root:
 
@@ -320,34 +384,28 @@ docker build -t fraud-detection-api .
 Run the Container
 docker run -p 8000:8000 fraud-detection-api
 
-The API can then be accessed at:
+The application can then be accessed locally through port 8000.
 
-http://127.0.0.1:8000
-
-Health endpoint:
-
+Health Check
 http://127.0.0.1:8000/health
 
-Swagger documentation:
-
-http://127.0.0.1:8000/docs
-
-The Dockerised application successfully returned:
+Successful Docker health response:
 
 {
-  "status": "healthy",
-  "model_loaded": true,
-  "model": "Tuned Random Forest",
-  "threshold": 0.55,
-  "number_of_features": 52
+    "status": "healthy",
+    "model_loaded": true,
+    "model": "Tuned Random Forest",
+    "threshold": 0.55,
+    "number_of_features": 52
 }
-Project Structure
-July 10Analytic NOVA Project/
+
+This confirms that the trained Random Forest model can be successfully loaded and served from inside the Docker container.
+
+📁 Repository Structure
+Novapay-fraudulent/
 │
 ├── api/
 │   └── main.py
-│
-├── Data/
 │
 ├── Figures/
 │   ├── shap_feature_importance.png
@@ -355,73 +413,77 @@ July 10Analytic NOVA Project/
 │   └── shap_individual_fraud_waterfall.png
 │
 ├── Models/
-│   ├── feature_names.pkl
 │   ├── fraud_detection_model.pkl
-│   ├── fraud_detection_pipeline.pkl
-│   ├── fraud_random_forest_gridsearch.pkl
-│   └── standard_scaler.pkl
+│   └── feature_names.pkl
 │
 ├── Dockerfile
 ├── Requirements-docker.txt
-├── requirements.txt
 ├── README.md
 └── .gitignore
-Technologies Used
-Python
-Pandas
-NumPy
-Scikit-learn
-Matplotlib
-SHAP
-FastAPI
-Uvicorn
-Pydantic
-Joblib
-Docker
-Git
-GitHub
-Jupyter Notebook
-Visual Studio Code
-Key Insights
+🛠️ Technology Stack
+Area	Technologies
+Programming	Python
+Data Manipulation	Pandas, NumPy
+Machine Learning	Scikit-learn
+Explainable AI	SHAP
+Visualisation	Matplotlib
+API	FastAPI, Uvicorn
+Validation	Pydantic
+Model Persistence	Joblib
+Containerisation	Docker
+Version Control	Git, GitHub
+Development	VS Code, Jupyter Notebook
+⚠️ Model Limitations
 
-The modelling results demonstrate that transaction behaviour and risk characteristics are stronger fraud indicators than transaction amount alone.
+Although the final model achieved very high precision, approximately 20% of fraudulent transactions remained undetected.
 
-The most important indicators included:
+In a real financial environment, the cost associated with false negatives may justify selecting a lower operating threshold or introducing additional fraud-review layers.
 
-High 24-hour transaction velocity
-High one-hour transaction velocity
-High IP risk
-High internal risk score
-Low account age
-Low device trust
-Chargeback history
-Geographic location mismatch
+The model should therefore be considered a demonstration of an end-to-end fraud detection architecture rather than a production banking fraud system.
 
-The model achieved extremely high precision, meaning transactions classified as fraudulent were highly likely to be genuinely fraudulent.
+Real-world deployment would additionally require:
 
-However, fraud recall remained approximately 80%, indicating that some fraudulent transactions were still missed. Future development should therefore focus on improving recall without creating an unacceptable number of false-positive alerts.
+Continuous model monitoring
+Data-drift detection
+Security and authentication
+Model governance
+Bias and fairness assessment
+Regulatory review
+Automated retraining
+Human fraud-investigation workflows
+🔮 Future Development
 
-Conclusion
+Potential improvements include:
 
-The project demonstrates an end-to-end fraud detection workflow integrating machine learning, hyperparameter optimisation, decision-threshold tuning, explainable AI, API deployment, and Docker containerisation.
-
-Random Forest substantially outperformed Logistic Regression in overall fraud classification performance.
-
-The final system combines a tuned Random Forest model with SHAP explainability and FastAPI deployment, while Docker provides a reproducible and portable environment for running the application.
-
-This demonstrates how machine learning can be extended beyond model training into an explainable and deployable fraud detection system.
-
-Future Improvements
-
-Future development may include:
-
-Improving fraud recall
-Cost-sensitive classification
-Precision-recall optimisation
-Additional ensemble models such as XGBoost or LightGBM
-Automated raw-data preprocessing within the API
-Drift monitoring
-Model retraining pipelines
-Authentication and API security
-Cloud deployment
+Optimising specifically for fraud recall and financial cost
+Cost-sensitive learning
+XGBoost or LightGBM benchmarking
+Automated preprocessing of raw API inputs
+Model and data-drift monitoring
+API authentication
+Automated testing
 CI/CD integration
+Cloud deployment
+Real-time transaction streaming
+Analyst-facing fraud monitoring dashboard
+🏁 Conclusion
+
+This project demonstrates an end-to-end machine-learning approach to fraud detection.
+
+A tuned Random Forest classifier achieved strong fraud classification performance, while SHAP provided transparent global and transaction-level explanations.
+
+The project was subsequently extended beyond model development by exposing predictions through FastAPI and containerising the application with Docker.
+
+The completed workflow demonstrates practical capabilities across:
+
+Data preparation → Machine learning → Hyperparameter optimisation → Model evaluation → Explainable AI → API development → Containerisation → Version control
+
+👤 Author
+
+Leonard Mgbeahuruike
+
+Data Analytics · Machine Learning · Environmental & Sustainability Analytics
+
+🔗 Repository
+
+This repository contains the machine-learning model, SHAP explainability outputs, FastAPI application, and Docker configuration required to reproduce the deployment architecture.
