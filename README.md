@@ -34,6 +34,12 @@ The selected threshold prioritises very high precision while maintaining approxi
 
 This means transactions classified as fraudulent have a very low false-positive rate, although further work could focus on identifying a greater proportion of fraudulent transactions.
 
+System's Architecture
+
+The architecture below illustrates the end-to-end fraud detection pipeline, from transaction data preparation through machine-learning optimisation, explainability, API deployment, and Docker containerisation.
+
+![Fraud Detection System Architecture](Figures/fraud_detection_architecture.png)
+
 🧠 Machine Learning Workflow
 Raw Transaction Data
         │
